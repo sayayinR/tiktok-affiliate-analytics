@@ -6,23 +6,24 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 14 (App Router), React, TypeScript, Tailwind CSS |
-| Backend | Next.js API Routes, Supabase (Postgres) |
-| Auth | Clerk (with TikTok OAuth) |
-| Caching | Upstash Redis |
-| Billing | Stripe |
-| AI Layer | Anthropic Claude API |
-| Data APIs | TikTok Display API + EnsembleData (scraping) |
-| Testing | Vitest + React Testing Library |
-| Deployment | Vercel |
+| Layer      | Technology                                               |
+| ---------- | -------------------------------------------------------- |
+| Frontend   | Next.js 14 (App Router), React, TypeScript, Tailwind CSS |
+| Backend    | Next.js API Routes, Supabase (Postgres)                  |
+| Auth       | Clerk (with TikTok OAuth)                                |
+| Caching    | Upstash Redis                                            |
+| Billing    | Stripe                                                   |
+| AI Layer   | Anthropic Claude API                                     |
+| Data APIs  | TikTok Display API + EnsembleData (scraping)             |
+| Testing    | Vitest + React Testing Library                           |
+| Deployment | Vercel                                                   |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js v18+ (you have v24.11.0 ✅)
 - Git (you have v2.53.0 ✅)
 - A GitHub account
@@ -88,29 +89,35 @@ npm run test:coverage
 ## External Services Setup
 
 ### Clerk (Auth)
+
 1. Go to [clerk.com](https://clerk.com) → Create application
 2. Copy `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` to `.env.local`
 3. In Clerk dashboard → Social Connections → Enable TikTok
 
 ### Supabase (Database)
+
 1. Go to [supabase.com](https://supabase.com) → New project
 2. Copy your project URL and anon key from Settings → API
 3. Run `schema.sql` in the SQL editor
 
 ### Stripe (Billing)
+
 1. Go to [stripe.com](https://stripe.com) → Get API keys
 2. Create two products: Pro ($29/mo) and Enterprise ($79/mo)
 3. Copy the price IDs to `.env.local`
 
 ### EnsembleData (TikTok Scraping)
+
 1. Go to [ensembledata.com](https://ensembledata.com) → Sign up
 2. Copy your API key to `.env.local`
 
 ### Anthropic (AI)
+
 1. Go to [console.anthropic.com](https://console.anthropic.com) → API Keys
 2. Copy key to `.env.local`
 
 ### Upstash Redis (Caching)
+
 1. Go to [console.upstash.com](https://console.upstash.com) → Create database
 2. Copy REST URL and token to `.env.local`
 
@@ -169,11 +176,11 @@ git push origin main
 
 ## Pricing Tiers
 
-| Feature | Free | Pro ($29/mo) | Enterprise ($79/mo) |
-|---|---|---|---|
-| Data history | 7 days | 90 days | Unlimited |
-| Competitor tracking | — | Up to 5 | Unlimited |
-| Hook analysis | 5/mo | Unlimited | Unlimited |
-| AI script suggestions | — | ✅ | ✅ |
-| Multi-account | — | — | ✅ |
-| API access | — | — | ✅ |
+| Feature               | Free   | Pro ($29/mo) | Enterprise ($79/mo) |
+| --------------------- | ------ | ------------ | ------------------- |
+| Data history          | 7 days | 90 days      | Unlimited           |
+| Competitor tracking   | —      | Up to 5      | Unlimited           |
+| Hook analysis         | 5/mo   | Unlimited    | Unlimited           |
+| AI script suggestions | —      | ✅           | ✅                  |
+| Multi-account         | —      | —            | ✅                  |
+| API access            | —      | —            | ✅                  |
