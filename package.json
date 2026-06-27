@@ -7,12 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run tests/integration",
-    "test:unit": "vitest run tests/unit",
+    "test": "vitest run --config vitest.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
+    "test:ui": "vitest --ui --config vitest.config.mts",
+    "test:coverage": "vitest run --coverage --config vitest.config.mts",
+    "test:integration": "vitest run tests/integration --config vitest.config.mts",
+    "test:unit": "vitest run tests/unit --config vitest.config.mts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
