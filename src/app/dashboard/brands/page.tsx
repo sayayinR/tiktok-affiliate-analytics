@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, ShoppingBag, Video, TrendingUp } from "lucide-react";
+import { Plus, ShoppingBag, Package } from "lucide-react";
 import { formatCount } from "@/lib/utils";
 
 interface Brand {
   id: string;
   name: string;
-  keywords: string[];
   color: string;
   video_count?: number;
   total_views?: number;
-  avg_views?: number;
-  last_posted?: string;
+  product_count?: number;
 }
 
 const COLORS = [
@@ -33,7 +31,6 @@ export default function BrandsPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    keywords: "",
     color: COLORS[0],
   });
 
@@ -63,16 +60,12 @@ export default function BrandsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(),
-          keywords: form.keywords
-            .split(",")
-            .map((k) => k.trim().toLowerCase())
-            .filter(Boolean),
           color: form.color,
         }),
       });
 
       if (res.ok) {
-        setForm({ name: "", keywords: "", color: COLORS[0] });
+        setForm({ name: "", color: COLORS[0] });
         setShowForm(false);
         fetchBrands();
       }
@@ -108,42 +101,23 @@ export default function BrandsPage() {
       {showForm && (
         <div className="rounded-lg border border-brand/30 bg-card p-5 space-y-4">
           <h3 className="text-sm font-semibold text-foreground">
-            New Brand / Product
+            New Brand
           </h3>
 
           <div className="space-y-3">
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">
-                Brand / Product Name *
+                Brand Name *
               </label>
               <input
                 type="text"
-                placeholder="e.g. Snap Chews"
+                placeholder="e.g. Snap Supplements"
                 value={form.name}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, name: e.target.value }))
                 }
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand"
               />
-            </div>
-
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">
-                Keywords (comma separated) — used to auto-tag your videos
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. snap chews, beet chews, nitric oxide chews"
-                value={form.keywords}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, keywords: e.target.value }))
-                }
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Any video description containing these keywords will be tagged
-                to this brand automatically.
-              </p>
             </div>
 
             <div>
@@ -202,8 +176,8 @@ export default function BrandsPage() {
             No brands yet
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
-            Add your first brand or product to start tracking performance across
-            your videos.
+            Add your first brand to start tracking performance across your
+            products and videos.
           </p>
           <button
             onClick={() => setShowForm(true)}
@@ -247,31 +221,14 @@ export default function BrandsPage() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
-                    Avg Views
+                    Products
                   </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {formatCount(brand.avg_views || 0)}
+                  <p className="text-lg font-bold text-foreground flex items-center gap-1">
+                    <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                    {brand.product_count || 0}
                   </p>
                 </div>
               </div>
-
-              {brand.keywords && brand.keywords.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {brand.keywords.slice(0, 3).map((kw) => (
-                    <span
-                      key={kw}
-                      className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded"
-                    >
-                      {kw}
-                    </span>
-                  ))}
-                  {brand.keywords.length > 3 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{brand.keywords.length - 3} more
-                    </span>
-                  )}
-                </div>
-              )}
             </a>
           ))}
         </div>

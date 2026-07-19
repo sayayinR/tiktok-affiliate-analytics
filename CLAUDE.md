@@ -35,7 +35,7 @@ src/
     dashboard/
       layout.tsx                - Protected layout, checks onboarded status
       overview/                 - Main dashboard
-      brands/                   - Brands & Products section
+      brands/                   - Brands & Products section (Brand -> Product -> Video)
       hooks/                    - Hook Analyzer (not yet built)
       content-planner/          - Content Planner (not yet built)
     onboarding/                 - 4-step onboarding flow
@@ -47,7 +47,8 @@ src/
       auth/tiktok/debug/        - Debug route (remove in production)
       tiktok/sync/              - Sync videos from TikTok API
       tiktok/videos/            - Fetch videos from Supabase
-      brands/                   - CRUD for brands
+      brands/                   - CRUD for brands (parent-level)
+      products/                 - CRUD for products (SKU-level, belongs to a brand)
       onboarding/               - Save onboarding data
       health/                   - Health check (public)
   components/
@@ -80,10 +81,15 @@ tiktok_videos
   - user_id, tiktok_video_id, description, view_count
   - like_count, comment_count, share_count, duration
   - cover_image_url, create_time, hook_text, hook_type
-  - hook_score, brand_id
+  - hook_score, product_id
 
 brands
-  - user_id, name, keywords[], color
+  - user_id, name, color
+  (parent grouping, e.g. "Snap Supplements" — no keywords, brands don't tag videos directly)
+
+products
+  - user_id, brand_id, name, keywords[], color
+  (SKU-level, e.g. "Snap Chews" — keywords auto-tag tiktok_videos.product_id)
 
 hook_analyses
   - user_id, video_id, hook_text, hook_type, score
@@ -208,12 +214,13 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (not yet implemented)
 - TikTok OAuth flow (sandbox mode)
 - Video sync from TikTok API (20 videos per sync)
 - Top Videos table with real data
-- Brands & Products page with auto-tagging by keyword
+- Brands & Products: two-level Brand -> Product hierarchy, products auto-tag videos by keyword
+- Brand detail page (list of a brand's products with rolled-up stats)
+- Product detail page (videos tagged to a specific product, with performance data)
 - Dashboard overview with mock metric cards and charts
 - Deployed to Vercel + thewebmyster.com domain
 
 ## Features In Progress
-- Brands detail page (individual brand video list)
 - Full video archive (paginate all videos beyond 20)
 
 ## Features Planned

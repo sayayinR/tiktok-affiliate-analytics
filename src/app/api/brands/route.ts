@@ -19,39 +19,70 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Get brands with video stats
-    const { data: brands, error } = await supabaseAdmin()
+    const { data: brands, error: brandsError } = await supabaseAdmin()
       .from('brands')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (brandsError) throw brandsError
 
-    // Get video stats per brand
-    const brandsWithStats = await Promise.all(
-      (brands || []).map(async (brand) => {
-        const { data: videos } = await supabaseAdmin()
+    const { data: products, error: productsError } = await supabaseAdmin()
+      .from('products')
+      .select('id, brand_id')
+      .eq('user_id', user.id)
+
+    if (productsError) throw productsError
+
+    const productIds = (products || []).map((p) => p.id)
+
+    const { data: videos, error: videosError } = productIds.length
+      ? await supabaseAdmin()
           .from('tiktok_videos')
-          .select('view_count, create_time')
-          .eq('brand_id', brand.id)
+          .select('product_id, view_count')
+          .eq('user_id', user.id)
+          .in('product_id', productIds)
+      : { data: [] as { product_id: string; view_count: number }[], error: null }
 
-        const videoCount = videos?.length || 0
-        const totalViews = videos?.reduce((sum, v) => sum + (v.view_count || 0), 0) || 0
-        const avgViews = videoCount > 0 ? Math.round(totalViews / videoCount) : 0
-        const lastPosted = videos?.sort((a, b) => b.create_time - a.create_time)[0]?.create_time
+    if (videosError) throw videosError
 
-        return {
-          ...brand,
-          video_count: videoCount,
-          total_views: totalViews,
-          avg_views: avgViews,
-          last_posted: lastPosted
-            ? new Date(lastPosted * 1000).toISOString()
-            : null,
-        }
-      })
-    )
+    // product_id -> { videoCount, totalViews }
+    const statsByProduct = new Map<string, { videoCount: number; totalViews: number }>()
+    for (const v of videos || []) {
+      const entry = statsByProduct.get(v.product_id) || { videoCount: 0, totalViews: 0 }
+      entry.videoCount += 1
+      entry.totalViews += v.view_count || 0
+      statsByProduct.set(v.product_id, entry)
+    }
+
+    // brand_id -> [product ids]
+    const productIdsByBrand = new Map<string, string[]>()
+    for (const p of products || []) {
+      const list = productIdsByBrand.get(p.brand_id) || []
+      list.push(p.id)
+      productIdsByBrand.set(p.brand_id, list)
+    }
+
+    const brandsWithStats = (brands || []).map((brand) => {
+      const ids = productIdsByBrand.get(brand.id) || []
+      const rolled = ids.reduce(
+        (acc, pid) => {
+          const s = statsByProduct.get(pid)
+          if (s) {
+            acc.videoCount += s.videoCount
+            acc.totalViews += s.totalViews
+          }
+          return acc
+        },
+        { videoCount: 0, totalViews: 0 }
+      )
+      return {
+        ...brand,
+        video_count: rolled.videoCount,
+        total_views: rolled.totalViews,
+        product_count: ids.length,
+      }
+    })
 
     return NextResponse.json({ brands: brandsWithStats })
   } catch (err) {
@@ -77,45 +108,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const { name, keywords, color } = await req.json()
+    const { name, color } = await req.json()
 
-    // Create brand
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+    }
+
     const { data: brand, error } = await supabaseAdmin()
       .from('brands')
       .insert({
         user_id: user.id,
-        name,
-        keywords,
+        name: name.trim(),
         color,
       })
       .select()
       .single()
 
     if (error) throw error
-
-    // Auto-tag existing videos that match keywords
-    if (keywords && keywords.length > 0) {
-      const { data: videos } = await supabaseAdmin()
-        .from('tiktok_videos')
-        .select('id, description')
-        .eq('user_id', user.id)
-        .is('brand_id', null)
-
-      const matchingVideoIds = (videos || [])
-        .filter((v) =>
-          keywords.some((kw: string) =>
-            v.description?.toLowerCase().includes(kw.toLowerCase())
-          )
-        )
-        .map((v) => v.id)
-
-      if (matchingVideoIds.length > 0) {
-        await supabaseAdmin()
-          .from('tiktok_videos')
-          .update({ brand_id: brand.id })
-          .in('id', matchingVideoIds)
-      }
-    }
 
     return NextResponse.json({ success: true, brand })
   } catch (err) {

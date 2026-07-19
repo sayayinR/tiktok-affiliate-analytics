@@ -29,11 +29,23 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- ─────────────────────────────────────────
--- BRANDS (products a creator tracks; auto-tags videos by keyword)
+-- BRANDS (parent grouping for products, e.g. "Snap Supplements")
 -- ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS brands (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  color TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ─────────────────────────────────────────
+-- PRODUCTS (SKUs under a brand; auto-tags videos by keyword)
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS products (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  brand_id UUID NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   keywords TEXT[] DEFAULT '{}',
   color TEXT,
@@ -58,7 +70,7 @@ CREATE TABLE IF NOT EXISTS tiktok_videos (
   cover_image_url TEXT,
   hashtags TEXT[],
   create_time BIGINT,
-  brand_id UUID REFERENCES brands(id) ON DELETE SET NULL,
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
   -- AI analyzed fields
   hook_text TEXT,
   hook_type TEXT,
@@ -129,9 +141,11 @@ CREATE TABLE IF NOT EXISTS content_scripts (
 -- INDEXES for performance
 -- ─────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_brands_user_id ON brands(user_id);
+CREATE INDEX IF NOT EXISTS idx_products_user_id ON products(user_id);
+CREATE INDEX IF NOT EXISTS idx_products_brand_id ON products(brand_id);
 CREATE INDEX IF NOT EXISTS idx_tiktok_videos_user_id ON tiktok_videos(user_id);
 CREATE INDEX IF NOT EXISTS idx_tiktok_videos_create_time ON tiktok_videos(create_time DESC);
-CREATE INDEX IF NOT EXISTS idx_tiktok_videos_brand_id ON tiktok_videos(brand_id);
+CREATE INDEX IF NOT EXISTS idx_tiktok_videos_product_id ON tiktok_videos(product_id);
 CREATE INDEX IF NOT EXISTS idx_performance_snapshots_user_date ON performance_snapshots(user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_content_scripts_user_id ON content_scripts(user_id);
 CREATE INDEX IF NOT EXISTS idx_content_scripts_scheduled ON content_scripts(scheduled_for);
@@ -141,6 +155,7 @@ CREATE INDEX IF NOT EXISTS idx_content_scripts_scheduled ON content_scripts(sche
 -- ─────────────────────────────────────────
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE brands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tiktok_videos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hook_analyses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE performance_snapshots ENABLE ROW LEVEL SECURITY;

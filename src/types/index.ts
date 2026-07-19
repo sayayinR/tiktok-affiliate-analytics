@@ -116,17 +116,30 @@ export interface DailyMetric {
 }
 
 // ─────────────────────────────────────────
-// Brand Types
+// Brand & Product Types
 // ─────────────────────────────────────────
 
 export interface Brand {
   id: string
   userId: string
   name: string
-  keywords: string[]
   color: string
   createdAt: string
   // Computed server-side in GET /api/brands, not DB columns
+  videoCount?: number
+  totalViews?: number
+  productCount?: number
+}
+
+export interface Product {
+  id: string
+  userId: string
+  brandId: string
+  name: string
+  keywords: string[]
+  color: string
+  createdAt: string
+  // Computed server-side, not DB columns
   videoCount?: number
   totalViews?: number
   avgViews?: number
