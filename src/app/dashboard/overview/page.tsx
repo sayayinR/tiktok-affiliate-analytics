@@ -1,20 +1,24 @@
-import { Suspense } from 'react'
-import { MetricCards } from '@/components/dashboard/MetricCards'
-import { PerformanceChart } from '@/components/dashboard/PerformanceChart'
-import { TopVideosTable } from '@/components/dashboard/TopVideosTable'
-import { QuickActions } from '@/components/dashboard/QuickActions'
+import { Suspense } from "react";
+import { MetricCards } from "@/components/dashboard/MetricCards";
+import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
+import { TopVideosTable } from "@/components/dashboard/TopVideosTable";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { SyncButton } from "@/components/dashboard/SyncButton";
 
-export const metadata = { title: 'Overview' }
+export const metadata = { title: "Overview" };
 
 export default function OverviewPage() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Overview</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Your TikTok Shop performance at a glance
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Overview</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Your TikTok Shop performance at a glance
+          </p>
+        </div>
+        <SyncButton />
       </div>
 
       {/* Quick actions */}
@@ -40,10 +44,9 @@ export default function OverviewPage() {
         <TopVideosTable />
       </Suspense>
     </div>
-  )
+  );
 }
 
-// Loading skeletons
 function MetricCardsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -51,13 +54,13 @@ function MetricCardsSkeleton() {
         <div key={i} className="h-28 rounded-lg bg-secondary animate-pulse" />
       ))}
     </div>
-  )
+  );
 }
 
 function ChartSkeleton() {
-  return <div className="h-72 rounded-lg bg-secondary animate-pulse" />
+  return <div className="h-72 rounded-lg bg-secondary animate-pulse" />;
 }
 
 function TableSkeleton() {
-  return <div className="h-64 rounded-lg bg-secondary animate-pulse" />
+  return <div className="h-64 rounded-lg bg-secondary animate-pulse" />;
 }
