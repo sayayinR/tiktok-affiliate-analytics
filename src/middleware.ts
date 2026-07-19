@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   '/auth/register(.*)',
   '/api/health(.*)',
   '/api/auth/tiktok/callback(.*)',
+  '/api/auth/tiktok/debug(.*)',
   '/onboarding(.*)',
   '/legal(.*)',
   '/tiktok(.*)',

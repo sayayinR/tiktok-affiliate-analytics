@@ -4,12 +4,18 @@ export function getTikTokAuthUrl(state: string): string {
   const params = new URLSearchParams({
     client_key: process.env.TIKTOK_CLIENT_KEY!,
     response_type: 'code',
-    scope: 'user.info.profile,user.info.stats,video.list',
+    scope: 'user.info.basic,user.info.profile,user.info.stats,video.list',
     redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/tiktok/callback`,
     state,
   })
 
-  return `${TIKTOK_AUTH_URL}?${params.toString()}`
+  // Use sandbox URL for development
+  const isSandbox = process.env.TIKTOK_SANDBOX === 'true'
+  const baseUrl = isSandbox 
+    ? 'https://www.tiktok.com/v2/auth/authorize/'
+    : 'https://www.tiktok.com/v2/auth/authorize/'
+
+  return `${baseUrl}?${params.toString()}`
 }
 
 export async function exchangeCodeForToken(code: string): Promise<{
