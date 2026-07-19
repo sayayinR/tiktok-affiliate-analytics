@@ -46,3 +46,27 @@ export async function POST() {
       description: v.video_description || '',
       view_count: v.view_count || 0,
       like_count: v.like_count || 0,
+      comment_count: v.comment_count || 0,
+      share_count: v.share_count || 0,
+      duration: v.duration || 0,
+      cover_image_url: v.cover_image_url || '',
+      create_time: v.create_time || 0,
+      fetched_at: new Date().toISOString(),
+    }))
+
+    const { error: insertError } = await supabaseAdmin()
+      .from('tiktok_videos')
+      .upsert(videoRecords, { onConflict: 'user_id,tiktok_video_id' })
+
+    if (insertError) throw insertError
+
+    return NextResponse.json({
+      success: true,
+      count: videos.length,
+      message: `Synced ${videos.length} videos`,
+    })
+  } catch (err) {
+    console.error('Sync error:', err)
+    return NextResponse.json({ error: 'Sync failed' }, { status: 500 })
+  }
+}
