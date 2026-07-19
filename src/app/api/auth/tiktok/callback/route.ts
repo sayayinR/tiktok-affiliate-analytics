@@ -11,13 +11,13 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/overview?error=tiktok_auth_failed`
+      'https://www.thewebmyster.com/dashboard/overview?error=tiktok_auth_failed'
     )
   }
 
   if (!code || !state) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/overview?error=missing_params`
+      'https://www.thewebmyster.com/dashboard/overview?error=missing_params'
     )
   }
 
@@ -43,12 +43,12 @@ export async function GET(req: NextRequest) {
     if (dbError) throw dbError
 
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/overview?connected=true`
+      'https://www.thewebmyster.com/dashboard/overview?connected=true'
     )
   } catch (err) {
     console.error('TikTok OAuth error:', err)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/overview?error=tiktok_auth_failed`
+      'https://www.thewebmyster.com/dashboard/overview?error=tiktok_auth_failed'
     )
   }
 }

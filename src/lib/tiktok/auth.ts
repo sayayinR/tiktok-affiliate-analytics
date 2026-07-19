@@ -5,7 +5,7 @@ export function getTikTokAuthUrl(state: string): string {
     client_key: process.env.TIKTOK_CLIENT_KEY!,
     response_type: 'code',
     scope: 'user.info.basic,user.info.profile,user.info.stats,video.list',
-    redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/tiktok/callback`,
+    redirect_uri: 'https://www.thewebmyster.com/api/auth/tiktok/callback',
     state,
   })
 
@@ -35,7 +35,7 @@ export async function exchangeCodeForToken(code: string): Promise<{
       client_secret: process.env.TIKTOK_CLIENT_SECRET!,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/tiktok/callback`,
+     redirect_uri: 'https://www.thewebmyster.com/api/auth/tiktok/callback',
     }),
   })
 
