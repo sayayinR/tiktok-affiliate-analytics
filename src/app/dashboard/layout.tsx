@@ -12,14 +12,12 @@ export default async function DashboardLayout({
   const { userId } = await auth();
   if (!userId) redirect("/auth/login");
 
-  // Check if user has completed onboarding
   const { data: user } = await supabaseAdmin()
     .from("users")
-    .select("onboarded")
+    .select("onboarded, tiktok_connected, tiktok_username")
     .eq("clerk_id", userId)
     .single();
 
-  // New user — no record yet or not onboarded
   if (!user || !user.onboarded) {
     redirect("/onboarding");
   }
@@ -28,7 +26,10 @@ export default async function DashboardLayout({
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar />
+        <TopBar
+          tiktokConnected={user.tiktok_connected}
+          tiktokUsername={user.tiktok_username}
+        />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="mx-auto max-w-7xl animate-fade-in">{children}</div>
         </main>

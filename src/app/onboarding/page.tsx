@@ -68,7 +68,31 @@ export default function OnboardingPage() {
   const handleNext = () => setStep((s) => s + 1);
   const handleBack = () => setStep((s) => s - 1);
 
-  const handleFinish = async () => {
+  const handleSaveAndConnect = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          niches: selections.niches,
+          goals: selections.goals,
+          formats: selections.formats,
+        }),
+      });
+
+      if (res.ok) {
+        // Redirect to TikTok OAuth
+        window.location.href = "/api/auth/tiktok";
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSkipTikTok = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/onboarding", {
@@ -100,7 +124,7 @@ export default function OnboardingPage() {
             <span className="text-brand font-bold text-lg">AffiliateIQ</span>
           </div>
           <div className="flex gap-2 mb-6">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
                 className={`h-1 flex-1 rounded-full transition-colors ${
@@ -110,12 +134,13 @@ export default function OnboardingPage() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">
-            Step {step} of 3
+            Step {step} of 4
           </p>
           <h1 className="text-2xl font-bold text-foreground">
             {step === 1 && "What niches do you work in?"}
             {step === 2 && "How do you create content?"}
             {step === 3 && "What are your goals?"}
+            {step === 4 && "Connect your TikTok account"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {step === 1 &&
@@ -124,10 +149,12 @@ export default function OnboardingPage() {
               "Select all formats you use — many creators mix it up."}
             {step === 3 &&
               "Select all that apply — we will optimize for everything you pick."}
+            {step === 4 &&
+              "Connect TikTok to pull your real video data, views, and performance metrics."}
           </p>
         </div>
 
-        {/* Step 1 — Niches (multi-select) */}
+        {/* Step 1 — Niches */}
         {step === 1 && (
           <div className="grid grid-cols-3 gap-3">
             {NICHES.map((n) => {
@@ -155,7 +182,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2 — Formats (multi-select) */}
+        {/* Step 2 — Formats */}
         {step === 2 && (
           <div className="flex flex-col gap-3">
             {FORMATS.map((f) => {
@@ -187,7 +214,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3 — Goals (multi-select) */}
+        {/* Step 3 — Goals */}
         {step === 3 && (
           <div className="flex flex-col gap-3">
             {GOALS.map((g) => {
@@ -219,37 +246,72 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="flex gap-3 mt-8">
-          {step > 1 && (
+        {/* Step 4 — Connect TikTok */}
+        {step === 4 && (
+          <div className="flex flex-col gap-4">
+            <div className="rounded-lg border border-border bg-card p-6 text-center">
+              <div className="text-5xl mb-4">🎵</div>
+              <h3 className="text-lg font-bold text-foreground mb-2">
+                Connect your TikTok account
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                AffiliateIQ will pull your video performance data including
+                views, engagement, and metrics — all in one place.
+              </p>
+              <button
+                onClick={handleSaveAndConnect}
+                disabled={loading}
+                className="w-full py-3 rounded-lg bg-brand text-background font-bold text-sm disabled:opacity-30 hover:bg-brand-dark transition-colors"
+              >
+                {loading ? "Saving..." : "🎵 Connect TikTok →"}
+              </button>
+            </div>
+
             <button
-              onClick={handleBack}
-              className="flex-1 py-3 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors text-sm font-medium"
+              onClick={handleSkipTikTok}
+              disabled={loading}
+              className="w-full py-3 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors text-sm"
             >
-              Back
+              Skip for now — connect later
             </button>
-          )}
-          {step < 3 ? (
+          </div>
+        )}
+
+        {/* Navigation */}
+        {step < 4 && (
+          <div className="flex gap-3 mt-8">
+            {step > 1 && (
+              <button
+                onClick={handleBack}
+                className="flex-1 py-3 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors text-sm font-medium"
+              >
+                Back
+              </button>
+            )}
             <button
               onClick={handleNext}
               disabled={
                 (step === 1 && selections.niches.length === 0) ||
-                (step === 2 && selections.formats.length === 0)
+                (step === 2 && selections.formats.length === 0) ||
+                (step === 3 && selections.goals.length === 0)
               }
               className="flex-1 py-3 rounded-lg bg-brand text-background font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-dark transition-colors"
             >
               Continue →
             </button>
-          ) : (
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="mt-4">
             <button
-              onClick={handleFinish}
-              disabled={selections.goals.length === 0 || loading}
-              className="flex-1 py-3 rounded-lg bg-brand text-background font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-dark transition-colors"
+              onClick={handleBack}
+              className="w-full py-3 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
-              {loading ? "Setting up..." : "Launch My Dashboard →"}
+              ← Back
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
