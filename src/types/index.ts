@@ -20,7 +20,10 @@ export interface User {
   clerkId: string
   email: string
   plan: Plan
-  niche: Niche | null
+  niches: string[]
+  goals: string[]
+  formats: string[]
+  onboarded: boolean
   tiktokConnected: boolean
   tiktokUsername: string | null
   createdAt: string
@@ -113,19 +116,21 @@ export interface DailyMetric {
 }
 
 // ─────────────────────────────────────────
-// Competitor Types
+// Brand Types
 // ─────────────────────────────────────────
 
-export interface Competitor {
+export interface Brand {
   id: string
   userId: string
-  tiktokUsername: string
-  displayName: string
-  followerCount: number
-  niche: Niche
-  isTracking: boolean
-  lastSyncedAt: string | null
+  name: string
+  keywords: string[]
+  color: string
   createdAt: string
+  // Computed server-side in GET /api/brands, not DB columns
+  videoCount?: number
+  totalViews?: number
+  avgViews?: number
+  lastPosted?: string | null
 }
 
 export interface CompetitorInsight {

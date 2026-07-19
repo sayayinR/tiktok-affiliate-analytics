@@ -35,7 +35,7 @@ export async function exchangeCodeForToken(code: string): Promise<{
       client_secret: process.env.TIKTOK_CLIENT_SECRET!,
       code,
       grant_type: 'authorization_code',
-     redirect_uri: 'https://www.thewebmyster.com/api/auth/tiktok/callback',
+    redirect_uri: 'https://www.thewebmyster.com/api/auth/tiktok/callback',
     }),
   })
 
