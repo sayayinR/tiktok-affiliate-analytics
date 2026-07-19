@@ -1,42 +1,42 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Users,
   Zap,
   Calendar,
   Settings,
   TrendingUp,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  ShoppingBag,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   {
-    label: 'Overview',
-    href: '/dashboard/overview',
+    label: "Overview",
+    href: "/dashboard/overview",
     icon: LayoutDashboard,
   },
   {
-    label: 'Competitors',
-    href: '/dashboard/competitors',
-    icon: Users,
+    label: "Brands & Products",
+    href: "/dashboard/brands",
+    icon: ShoppingBag,
   },
   {
-    label: 'Hook Analyzer',
-    href: '/dashboard/hooks',
+    label: "Hook Analyzer",
+    href: "/dashboard/hooks",
     icon: Zap,
   },
   {
-    label: 'Content Planner',
-    href: '/dashboard/content-planner',
+    label: "Content Planner",
+    href: "/dashboard/content-planner",
     icon: Calendar,
   },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <aside className="flex h-full w-56 flex-col border-r border-border bg-card">
@@ -51,22 +51,22 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-3">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname.startsWith(item.href)
+          const isActive = pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? 'bg-accent text-brand'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  ? "bg-accent text-brand"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               {item.label}
             </Link>
-          )
+          );
         })}
       </nav>
 
@@ -81,5 +81,5 @@ export function Sidebar() {
         </Link>
       </div>
     </aside>
-  )
+  );
 }
