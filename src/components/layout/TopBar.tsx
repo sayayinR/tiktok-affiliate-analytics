@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { UserButton } from '@clerk/nextjs'
-import { Bell } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { UserButton } from "@clerk/nextjs";
+import { Bell } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function TopBar() {
-  const searchParams = useSearchParams()
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [showError, setShowError] = useState(false)
+  const searchParams = useSearchParams();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get('connected') === 'true') {
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 5000)
+    if (searchParams.get("connected") === "true") {
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 5000);
     }
-    if (searchParams.get('error')) {
-      setShowError(true)
-      setTimeout(() => setShowError(false), 5000)
+    if (searchParams.get("error")) {
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
@@ -43,7 +43,7 @@ export function TopBar() {
 
       <div className="flex items-center gap-3">
         {/* Connect TikTok button */}
-        
+        <a
           href="/api/auth/tiktok"
           className="flex items-center gap-2 rounded-md bg-brand/10 border border-brand/30 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/20 transition-colors"
         >
@@ -57,11 +57,11 @@ export function TopBar() {
         <UserButton
           appearance={{
             elements: {
-              avatarBox: 'h-8 w-8',
+              avatarBox: "h-8 w-8",
             },
           }}
         />
       </div>
     </header>
-  )
+  );
 }
