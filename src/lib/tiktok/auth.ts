@@ -62,7 +62,26 @@ export async function getTikTokUserInfo(accessToken: string, openId: string) {
   return data.data?.user
 }
 
-export async function getTikTokVideos(accessToken: string, openId: string) {
+export interface TikTokVideoPage {
+  videos: any[]
+  cursor: number | undefined
+  hasMore: boolean
+  error?: { code: string; message: string }
+}
+
+export async function getTikTokVideos(
+  accessToken: string,
+  openId: string,
+  cursor?: number
+): Promise<TikTokVideoPage> {
+  // TikTok's per-page cap is 20. Temporarily lower this (e.g. to 2-3) in a
+  // local-only change to exercise multi-page pagination against a sandbox
+  // app's small video set — revert to 20 before committing/deploying.
+  const body: Record<string, unknown> = { max_count: 20 }
+  if (cursor !== undefined) {
+    body.cursor = cursor
+  }
+
   const res = await fetch(
     'https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,duration,cover_image_url,share_url,view_count,like_count,comment_count,share_count,create_time',
     {
@@ -71,12 +90,30 @@ export async function getTikTokVideos(accessToken: string, openId: string) {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        max_count: 20,
-      }),
+      body: JSON.stringify(body),
     }
   )
 
   const data = await res.json()
-  return data.data?.videos || []
+
+  // TikTok's v2 envelope reports failures (including expired/invalid
+  // tokens) via `error.code !== 'ok'`, sometimes alongside a 200 status —
+  // check both the HTTP status and the error envelope.
+  if (!res.ok || (data.error && data.error.code && data.error.code !== 'ok')) {
+    return {
+      videos: [],
+      cursor: undefined,
+      hasMore: false,
+      error: {
+        code: data.error?.code || String(res.status),
+        message: data.error?.message || 'TikTok API request failed',
+      },
+    }
+  }
+
+  return {
+    videos: data.data?.videos || [],
+    cursor: data.data?.cursor,
+    hasMore: data.data?.has_more || false,
+  }
 }

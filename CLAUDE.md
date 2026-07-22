@@ -75,7 +75,7 @@ src/
 users
   - clerk_id, email, plan, niches[], goals[], formats[]
   - tiktok_connected, tiktok_username, tiktok_access_token
-  - tiktok_refresh_token, onboarded
+  - tiktok_refresh_token, tiktok_sync_cursor, onboarded
 
 tiktok_videos
   - user_id, tiktok_video_id, description, view_count
@@ -217,11 +217,11 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (not yet implemented)
 - Brands & Products: two-level Brand -> Product hierarchy, products auto-tag videos by keyword
 - Brand detail page (list of a brand's products with rolled-up stats)
 - Product detail page (videos tagged to a specific product, with performance data)
+- Full video history sync — resumable cursor-based pagination, handles Vercel Hobby's 60s function limit by resuming across multiple sync calls (client auto-loops until complete)
 - Dashboard overview with mock metric cards and charts
 - Deployed to Vercel + thewebmyster.com domain
 
 ## Features In Progress
-- Full video archive (paginate all videos beyond 20)
 
 ## Features Planned
 - Search & Filter across all videos (by keyword, product, date range)
@@ -243,9 +243,10 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (not yet implemented)
 ## Known Issues and Tech Debt
 1. MetricCards and PerformanceChart still use mock data
 2. TikTok token refresh not implemented (tokens expire in 24hrs)
-3. Video sync limited to 20 videos (pagination not implemented)
+3. Full-history sync is resumable but bounded per-call by Vercel Hobby's 60s function limit (soft-stops at ~50s and resumes via a persisted cursor on users.tiktok_sync_cursor) — very large accounts may need several sync calls, handled automatically by SyncButton's client-side loop
 4. Debug route /api/auth/tiktok/debug should be removed in production
 5. NEXT_PUBLIC_APP_URL env var unreliable in Vercel — redirect URIs are hardcoded in auth.ts
+6. Long-running full-history syncs that cross the 24h token-expiry boundary (see #2) will fail mid-pagination with a TikTok auth error; the sync route detects this and returns a "reconnect TikTok" error rather than a generic failure, but the underlying token-refresh gap is not fixed by this work
 
 ---
 

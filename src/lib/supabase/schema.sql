@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
   tiktok_username TEXT,
   tiktok_access_token TEXT,
   tiktok_refresh_token TEXT,
+  tiktok_sync_cursor BIGINT,
   onboarded BOOLEAN NOT NULL DEFAULT FALSE,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 
+const MAX_OUTER_LOOPS = 50;
+const OUTER_LOOP_PAUSE_MS = 500;
+
 export function SyncButton() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -10,15 +13,37 @@ export function SyncButton() {
   const handleSync = async () => {
     setLoading(true);
     setMessage("");
-    try {
-      const res = await fetch("/api/tiktok/sync", { method: "POST" });
-      const data = await res.json();
 
-      if (data.success) {
-        setMessage(`✅ ${data.message}`);
-      } else {
-        setMessage(`❌ ${data.error || "Sync failed"}`);
+    let totalSynced = 0;
+
+    try {
+      for (let i = 0; i < MAX_OUTER_LOOPS; i++) {
+        const res = await fetch("/api/tiktok/sync", { method: "POST" });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          setMessage(`❌ ${data.error || "Sync failed"}`);
+          return;
+        }
+
+        totalSynced += data.count || 0;
+
+        if (data.complete) {
+          setMessage(`✅ Synced ${totalSynced} videos — up to date`);
+          return;
+        }
+
+        setMessage(`⏳ Synced ${totalSynced} videos so far...`);
+
+        // Brief pause between outer client-driven calls — the server
+        // already paces its own inter-page requests by 500ms, this is
+        // just a safety margin against hammering the endpoint back-to-back.
+        await new Promise((resolve) => setTimeout(resolve, OUTER_LOOP_PAUSE_MS));
       }
+
+      setMessage(
+        `⚠️ Synced ${totalSynced} videos but stopped after ${MAX_OUTER_LOOPS} rounds — try again to continue`
+      );
     } catch (err) {
       setMessage("❌ Sync failed");
     } finally {

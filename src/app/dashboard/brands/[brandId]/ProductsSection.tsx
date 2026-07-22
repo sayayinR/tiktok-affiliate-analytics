@@ -8,7 +8,6 @@ import { formatCount } from "@/lib/utils";
 export interface Product {
   id: string;
   name: string;
-  keywords: string[];
   color: string;
   video_count?: number;
   total_views?: number;
@@ -38,7 +37,6 @@ export function ProductsSection({
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    keywords: "",
     color: COLORS[0],
   });
   const [suggestions, setSuggestions] = useState<
@@ -77,19 +75,7 @@ export function ProductsSection({
     nameFocused && form.name.trim().length > 0 && filteredSuggestions.length > 0;
 
   const handleSelectSuggestion = (s: { phrase: string }) => {
-    setForm((f) => {
-      const existingKeywords = f.keywords
-        .split(",")
-        .map((k) => k.trim())
-        .filter(Boolean);
-      const alreadyPresent = existingKeywords.some(
-        (k) => k.toLowerCase() === s.phrase.toLowerCase()
-      );
-      const nextKeywords = alreadyPresent
-        ? f.keywords
-        : [...existingKeywords, s.phrase].join(", ");
-      return { ...f, name: s.phrase, keywords: nextKeywords };
-    });
+    setForm((f) => ({ ...f, name: s.phrase }));
     setNameFocused(false);
   };
 
@@ -102,17 +88,13 @@ export function ProductsSection({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(),
-          keywords: form.keywords
-            .split(",")
-            .map((k) => k.trim().toLowerCase())
-            .filter(Boolean),
           color: form.color,
           brandId,
         }),
       });
 
       if (res.ok) {
-        setForm({ name: "", keywords: "", color: COLORS[0] });
+        setForm({ name: "", color: COLORS[0] });
         setShowForm(false);
         router.refresh();
       }
@@ -188,25 +170,6 @@ export function ProductsSection({
                   ))}
                 </div>
               )}
-            </div>
-
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">
-                Keywords (comma separated) — used to auto-tag your videos
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. snap chews, beet chews, nitric oxide chews"
-                value={form.keywords}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, keywords: e.target.value }))
-                }
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Any video description containing these keywords will be tagged
-                to this product automatically.
-              </p>
             </div>
 
             <div>
@@ -306,24 +269,6 @@ export function ProductsSection({
                   </p>
                 </div>
               </div>
-
-              {product.keywords && product.keywords.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {product.keywords.slice(0, 3).map((kw) => (
-                    <span
-                      key={kw}
-                      className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded"
-                    >
-                      {kw}
-                    </span>
-                  ))}
-                  {product.keywords.length > 3 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{product.keywords.length - 3} more
-                    </span>
-                  )}
-                </div>
-              )}
             </a>
           ))}
         </div>
