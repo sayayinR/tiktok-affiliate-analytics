@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Tag, Video as VideoIcon } from "lucide-react";
+import { Tag, Video as VideoIcon, Search } from "lucide-react";
 import { formatCount, truncate } from "@/lib/utils";
 import { HookType } from "@/types";
 
@@ -25,6 +25,12 @@ interface UntaggedVideo {
   description: string;
   view_count: number;
   cover_image_url: string | null;
+}
+
+function firstWords(text: string, count: number): string {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= count) return words.join(" ");
+  return words.slice(0, count).join(" ") + "...";
 }
 
 const HOOK_TYPE_COLORS: Record<string, string> = {
@@ -56,6 +62,7 @@ export function TaggedVideosSection({
   const [failedThumbnailIds, setFailedThumbnailIds] = useState<Set<string>>(
     new Set()
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!showTagPanel) return;
@@ -90,7 +97,16 @@ export function TaggedVideosSection({
     setShowTagPanel(false);
     setSelectedIds(new Set());
     setUntaggedVideos([]);
+    setSearchQuery("");
   };
+
+  const filteredUntaggedVideos = searchQuery.trim()
+    ? untaggedVideos.filter((v) =>
+        (v.description || "")
+          .toLowerCase()
+          .includes(searchQuery.trim().toLowerCase())
+      )
+    : untaggedVideos;
 
   const handleSave = async () => {
     if (selectedIds.size === 0) return;
@@ -139,6 +155,19 @@ export function TaggedVideosSection({
             Select videos to tag
           </h4>
 
+          {!loadingUntagged && untaggedVideos.length > 0 && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-md border border-border bg-background pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand"
+              />
+            </div>
+          )}
+
           {loadingUntagged ? (
             <p className="text-xs text-muted-foreground">
               Loading untagged videos...
@@ -147,9 +176,13 @@ export function TaggedVideosSection({
             <p className="text-xs text-muted-foreground">
               No untagged videos available.
             </p>
+          ) : filteredUntaggedVideos.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              No videos match your search.
+            </p>
           ) : (
             <div className="max-h-80 overflow-y-auto rounded-md border border-border divide-y divide-border">
-              {untaggedVideos.map((v) => (
+              {filteredUntaggedVideos.map((v) => (
                 <label
                   key={v.id}
                   className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-accent/50 transition-colors cursor-pointer"
@@ -178,9 +211,14 @@ export function TaggedVideosSection({
                       <VideoIcon className="h-4 w-4 text-muted-foreground" />
                     </div>
                   )}
-                  <span className="flex-1 min-w-0 truncate text-foreground">
-                    {truncate(v.description || "No description", 60)}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground truncate">
+                      {firstWords(v.description || "No description", 10)}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {truncate(v.description || "No description", 60)}
+                    </p>
+                  </div>
                   <span className="text-xs text-muted-foreground flex-shrink-0">
                     {formatCount(v.view_count || 0)} views
                   </span>
