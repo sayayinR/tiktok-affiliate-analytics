@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Tag, Video as VideoIcon, Search, X } from "lucide-react";
+import { Tag, Video as VideoIcon, Search, X, ExternalLink } from "lucide-react";
 import { formatCount, truncate } from "@/lib/utils";
 import { HookType } from "@/types";
 
@@ -18,6 +18,7 @@ export interface Video {
   hook_type: HookType | null;
   hook_score: number | null;
   create_time: number;
+  share_url: string | null;
 }
 
 interface UntaggedVideo {
@@ -25,6 +26,7 @@ interface UntaggedVideo {
   description: string;
   view_count: number;
   cover_image_url: string | null;
+  share_url: string | null;
 }
 
 function firstWords(text: string, count: number): string {
@@ -242,6 +244,18 @@ export function TaggedVideosSection({
                   <span className="text-xs text-muted-foreground flex-shrink-0">
                     {formatCount(v.view_count || 0)} views
                   </span>
+                  {v.share_url && (
+                    <a
+                      href={v.share_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      title="Open on TikTok"
+                      className="flex-shrink-0 text-muted-foreground hover:text-brand transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
                 </label>
               ))}
             </div>
@@ -323,6 +337,18 @@ export function TaggedVideosSection({
               <span className="text-sm font-medium text-foreground w-16 text-right flex-shrink-0">
                 {formatCount(video.view_count || 0)}
               </span>
+
+              {video.share_url && (
+                <a
+                  href={video.share_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open on TikTok"
+                  className="flex-shrink-0 text-muted-foreground hover:text-brand transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              )}
 
               <button
                 onClick={() => handleUntag(video.id)}

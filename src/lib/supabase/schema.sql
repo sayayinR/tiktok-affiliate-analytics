@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS tiktok_videos (
   play_count BIGINT DEFAULT 0,
   duration INTEGER,
   cover_image_url TEXT,
+  share_url TEXT,
   hashtags TEXT[],
   create_time BIGINT,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,

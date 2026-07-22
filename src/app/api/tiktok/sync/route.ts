@@ -75,6 +75,7 @@ export async function POST() {
           share_count: v.share_count || 0,
           duration: v.duration || 0,
           cover_image_url: v.cover_image_url || '',
+          share_url: v.share_url || '',
           create_time: v.create_time || 0,
           fetched_at: new Date().toISOString(),
         }))

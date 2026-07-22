@@ -80,7 +80,7 @@ users
 tiktok_videos
   - user_id, tiktok_video_id, description, view_count
   - like_count, comment_count, share_count, duration
-  - cover_image_url, create_time, hook_text, hook_type
+  - cover_image_url, share_url, create_time, hook_text, hook_type
   - hook_score, product_id
 
 brands
@@ -108,7 +108,7 @@ content_scripts
 Always validate API availability before building any feature.
 
 ### What IS available via TikTok API (after OAuth):
-- Video list: id, description, view_count, like_count, comment_count, share_count, duration, cover_image_url, create_time
+- Video list: id, description, view_count, like_count, comment_count, share_count, duration, cover_image_url, share_url, create_time
 - User profile: display_name, avatar_url, follower_count, video_count
 - User stats: likes_count, following_count
 

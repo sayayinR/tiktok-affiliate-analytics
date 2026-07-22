@@ -21,7 +21,7 @@ export async function GET() {
 
     const { data: videos, error } = await supabaseAdmin()
       .from('tiktok_videos')
-      .select('id, description, view_count, cover_image_url')
+      .select('id, description, view_count, cover_image_url, share_url')
       .eq('user_id', user.id)
       .is('product_id', null)
       .order('view_count', { ascending: false })
