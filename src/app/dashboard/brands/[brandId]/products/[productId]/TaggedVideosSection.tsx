@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Tag, Video as VideoIcon, Search } from "lucide-react";
+import { Tag, Video as VideoIcon, Search, X } from "lucide-react";
 import { formatCount, truncate } from "@/lib/utils";
 import { HookType } from "@/types";
 
@@ -63,6 +63,7 @@ export function TaggedVideosSection({
     new Set()
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [untaggingId, setUntaggingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!showTagPanel) return;
@@ -126,6 +127,25 @@ export function TaggedVideosSection({
       console.error(err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleUntag = async (videoId: string) => {
+    setUntaggingId(videoId);
+    try {
+      const res = await fetch(`/api/products/${productId}/tag`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId }),
+      });
+
+      if (res.ok) {
+        router.refresh();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUntaggingId(null);
     }
   };
 
@@ -303,6 +323,15 @@ export function TaggedVideosSection({
               <span className="text-sm font-medium text-foreground w-16 text-right flex-shrink-0">
                 {formatCount(video.view_count || 0)}
               </span>
+
+              <button
+                onClick={() => handleUntag(video.id)}
+                disabled={untaggingId === video.id}
+                title="Untag"
+                className="flex-shrink-0 text-muted-foreground hover:text-destructive transition-colors disabled:opacity-30"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           ))}
         </div>

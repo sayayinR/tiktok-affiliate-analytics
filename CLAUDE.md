@@ -212,11 +212,11 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (not yet implemented)
 - Clerk authentication (login/register/onboarding)
 - 4-step onboarding (niches, formats, goals, TikTok connect)
 - TikTok OAuth flow (sandbox mode)
-- Video sync from TikTok API (20 videos per sync)
 - Top Videos table with real data
-- Brands & Products: two-level Brand -> Product hierarchy, products auto-tag videos by keyword
+- Brands & Products: two-level Brand -> Product hierarchy
 - Brand detail page (list of a brand's products with rolled-up stats)
 - Product detail page (videos tagged to a specific product, with performance data)
+- Manual video tagging — select untagged videos via search + checkboxes to tag them to a product, with a per-row Untag action to reverse it
 - Full video history sync — resumable cursor-based pagination, handles Vercel Hobby's 60s function limit by resuming across multiple sync calls (client auto-loops until complete)
 - Dashboard overview with mock metric cards and charts
 - Deployed to Vercel + thewebmyster.com domain
